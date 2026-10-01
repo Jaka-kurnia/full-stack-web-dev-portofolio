@@ -18,7 +18,7 @@ class ProjectController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Project/Index', [
-            'projects' => Project::with('skills')->latest()->get(),
+            'projects' => Project::with('skills')->latest()->paginate(2),
             'statuses' => config('portfolio.project_statuses'),
         ]);
     }

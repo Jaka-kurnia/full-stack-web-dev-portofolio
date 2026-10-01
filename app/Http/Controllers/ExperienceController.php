@@ -16,7 +16,7 @@ class ExperienceController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Experience/Index', [
-            'experiences' => Experience::query()->latest('start_date')->get(),
+            'experiences' => Experience::query()->latest('start_date')->paginate(4),
             'types' => config('portfolio.experience_types'),
         ]);
     }

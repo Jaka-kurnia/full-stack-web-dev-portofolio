@@ -16,7 +16,7 @@ class SkillController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Skill/Index', [
-            'skills' => Skill::query()->ordered()->get(),
+            'skills' => Skill::query()->ordered()->paginate(4),
             'categories' => config('portfolio.skill_categories'),
         ]);
     }

@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import Badge from '@/Components/Admin/Badge';
 import ConfirmDeleteModal from '@/Components/Admin/ConfirmDeleteModal';
+import Pagination from '@/Components/Admin/Pagination';
 import EmptyRow from '@/Components/Admin/EmptyRow';
 import FormField from '@/Components/Admin/FormField';
 import PageContainer from '@/Components/Admin/PageContainer';
@@ -62,7 +63,7 @@ export default function Index({ quotes }) {
                         <Table.HeaderCell>Aksi</Table.HeaderCell>
                     </Table.Header>
                     <Table.Body>
-                        {quotes.map((quote) => (
+                        {quotes.data.map((quote) => (
                             <Table.Row key={quote.id}>
                                 <Table.Cell>
                                     <div className="text-sm text-gray-900 italic">"{quote.content}"</div>
@@ -78,9 +79,10 @@ export default function Index({ quotes }) {
                                 </Table.Cell>
                             </Table.Row>
                         ))}
-                        {quotes.length === 0 && <EmptyRow colSpan={3} message="Belum ada quote." />}
+                        {quotes.data.length === 0 && <EmptyRow colSpan={3} message="Belum ada quote." />}
                     </Table.Body>
                 </Table>
+                <Pagination links={quotes.links} />
             </PageContainer>
 
             <Modal show={crud.isFormOpen} onClose={crud.closeForm}>

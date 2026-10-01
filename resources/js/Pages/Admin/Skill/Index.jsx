@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import Badge from '@/Components/Admin/Badge';
 import ConfirmDeleteModal from '@/Components/Admin/ConfirmDeleteModal';
+import Pagination from '@/Components/Admin/Pagination';
 import EmptyRow from '@/Components/Admin/EmptyRow';
 import FileField from '@/Components/Admin/FileField';
 import FormField from '@/Components/Admin/FormField';
@@ -82,7 +83,7 @@ export default function Index({ skills, categories }) {
                         <Table.HeaderCell>Aksi</Table.HeaderCell>
                     </Table.Header>
                     <Table.Body>
-                        {skills.map((skill) => (
+                        {skills.data.map((skill) => (
                             <Table.Row key={skill.id}>
                                 <Table.Cell>
                                     {skill.image_path ? (
@@ -121,9 +122,10 @@ export default function Index({ skills, categories }) {
                                 </Table.Cell>
                             </Table.Row>
                         ))}
-                        {skills.length === 0 && <EmptyRow colSpan={6} message="Belum ada skill yang ditambahkan." />}
+                        {skills.data.length === 0 && <EmptyRow colSpan={6} message="Belum ada skill yang ditambahkan." />}
                     </Table.Body>
                 </Table>
+                <Pagination links={skills.links} />
             </PageContainer>
 
             {/* Modal Tambah/Edit */}

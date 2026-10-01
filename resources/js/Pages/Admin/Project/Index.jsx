@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import ConfirmDeleteModal from '@/Components/Admin/ConfirmDeleteModal';
+import Pagination from '@/Components/Admin/Pagination';
 import EmptyRow from '@/Components/Admin/EmptyRow';
 import PageContainer from '@/Components/Admin/PageContainer';
 import Table from '@/Components/Table';
@@ -32,7 +33,7 @@ export default function Index({ projects }) {
                         <Table.HeaderCell>Aksi</Table.HeaderCell>
                     </Table.Header>
                     <Table.Body>
-                        {projects.map((project) => (
+                        {projects.data.map((project) => (
                             <Table.Row key={project.id}>
                                 <Table.Cell>
                                     <div className="flex items-center">
@@ -74,9 +75,10 @@ export default function Index({ projects }) {
                                 </Table.Cell>
                             </Table.Row>
                         ))}
-                        {projects.length === 0 && <EmptyRow colSpan={5} message="Belum ada project." />}
+                        {projects.data.length === 0 && <EmptyRow colSpan={5} message="Belum ada project." />}
                     </Table.Body>
                 </Table>
+                <Pagination links={projects.links} />
             </PageContainer>
 
             {/* Modal Hapus */}

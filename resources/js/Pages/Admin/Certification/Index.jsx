@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import ConfirmDeleteModal from '@/Components/Admin/ConfirmDeleteModal';
+import Pagination from '@/Components/Admin/Pagination';
 import EmptyRow from '@/Components/Admin/EmptyRow';
 import FileField from '@/Components/Admin/FileField';
 import FormField from '@/Components/Admin/FormField';
@@ -80,7 +81,7 @@ export default function Index({ certifications }) {
                         <Table.HeaderCell>Aksi</Table.HeaderCell>
                     </Table.Header>
                     <Table.Body>
-                        {certifications.map((cert) => (
+                        {certifications.data.map((cert) => (
                             <Table.Row key={cert.id}>
                                 <Table.Cell>
                                     {cert.badge_image_path ? (
@@ -114,9 +115,10 @@ export default function Index({ certifications }) {
                                 </Table.Cell>
                             </Table.Row>
                         ))}
-                        {certifications.length === 0 && <EmptyRow colSpan={5} message="Belum ada sertifikasi." />}
+                        {certifications.data.length === 0 && <EmptyRow colSpan={5} message="Belum ada sertifikasi." />}
                     </Table.Body>
                 </Table>
+                <Pagination links={certifications.links} />
             </PageContainer>
 
             {/* Modal Tambah/Edit */}

@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import Badge from '@/Components/Admin/Badge';
 import ConfirmDeleteModal from '@/Components/Admin/ConfirmDeleteModal';
+import Pagination from '@/Components/Admin/Pagination';
 import EmptyRow from '@/Components/Admin/EmptyRow';
 import FileField from '@/Components/Admin/FileField';
 import FormField from '@/Components/Admin/FormField';
@@ -88,7 +89,7 @@ export default function Index({ experiences, types }) {
                         <Table.HeaderCell>Aksi</Table.HeaderCell>
                     </Table.Header>
                     <Table.Body>
-                        {experiences.map((exp) => (
+                        {experiences.data.map((exp) => (
                             <Table.Row key={exp.id}>
                                 <Table.Cell>
                                     {exp.image_path ? (
@@ -119,9 +120,10 @@ export default function Index({ experiences, types }) {
                                 </Table.Cell>
                             </Table.Row>
                         ))}
-                        {experiences.length === 0 && <EmptyRow colSpan={5} message="Belum ada data latar pendidikan." />}
+                        {experiences.data.length === 0 && <EmptyRow colSpan={5} message="Belum ada data latar pendidikan." />}
                     </Table.Body>
                 </Table>
+                <Pagination links={experiences.links} />
             </PageContainer>
 
             {/* Modal Tambah/Edit */}

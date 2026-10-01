@@ -1,5 +1,7 @@
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import { useState, useEffect } from 'react';
 import { useTypewriter } from './Welcome/hooks/useTypewriter';
 import Navbar from './Welcome/Navbar';
 import HeroSection from './Welcome/HeroSection';
@@ -13,6 +15,24 @@ import Footer from './Welcome/Footer';
 export default function Welcome({ auth, canLogin, hero, skills, projects, experiences, certifications, quotes }) {
     const [selectedProject, setSelectedProject] = useState(null);
     const [selectedCertification, setSelectedCertification] = useState(null);
+    const [isDarkMode, setIsDarkMode] = useState(true);
+
+    useEffect(() => {
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100,
+        });
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            setIsDarkMode(false);
+        }
+    }, []);
+
+    const toggleTheme = () => {
+        setIsDarkMode(!isDarkMode);
+        localStorage.setItem('theme', !isDarkMode ? 'dark' : 'light');
+    };
 
     // Filter skills based on tab
     const programmingSkills = (skills || []).filter(s => s.category !== 'Tools');
@@ -27,13 +47,14 @@ export default function Welcome({ auth, canLogin, hero, skills, projects, experi
     const typedGreeting = useTypewriter(rawGreeting, 100, 3000);
 
     return (
-        <div className="min-h-screen bg-[#0B0F19] text-white font-sans selection:bg-indigo-500 selection:text-white overflow-x-hidden">
+        <div className={isDarkMode ? 'dark' : ''}>
+            <div className="min-h-screen bg-gray-50 dark:bg-[#0B0F19] text-gray-900 dark:text-white font-sans selection:bg-indigo-500 selection:text-white overflow-x-hidden transition-colors duration-300">
             <Head>
                 <title>{hero?.full_name || 'Portfolio'}</title>
                 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
             </Head>
 
-            <Navbar hero={hero} auth={auth} canLogin={canLogin} />
+            <Navbar hero={hero} auth={auth} canLogin={canLogin} isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
             <main className="max-w-7xl mx-auto px-6 md:px-16 pb-24 overflow-hidden">
                 <HeroSection hero={hero} typedGreeting={typedGreeting} />
@@ -46,17 +67,18 @@ export default function Welcome({ auth, canLogin, hero, skills, projects, experi
                     quotes={quotes}
                 />
                 <ProjectsSection projects={projects} onSelect={setSelectedProject} />
-                <CertificationsSection certifications={certifications} onSelect={setSelectedCertification} />
+                {/* <CertificationsSection certifications={certifications} onSelect={setSelectedCertification} /> */}
             </main>
 
             {selectedProject && (
                 <ProjectDetailModal project={selectedProject} onClose={() => setSelectedProject(null)} />
             )}
-            {selectedCertification && (
+            {/* {selectedCertification && (
                 <CertificationDetailModal certification={selectedCertification} onClose={() => setSelectedCertification(null)} />
-            )}
+            )} */}
 
             <Footer hero={hero} />
+            </div>
         </div>
     );
 }

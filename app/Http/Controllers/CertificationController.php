@@ -16,7 +16,7 @@ class CertificationController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Certification/Index', [
-            'certifications' => Certification::query()->latest('issue_date')->get(),
+            'certifications' => Certification::query()->latest('issue_date')->paginate(5),
         ]);
     }
 

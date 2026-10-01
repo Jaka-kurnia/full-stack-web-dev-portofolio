@@ -13,7 +13,7 @@ class QuoteController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Quote/Index', [
-            'quotes' => Quote::all(),
+            'quotes' => Quote::paginate(5),
         ]);
     }
 

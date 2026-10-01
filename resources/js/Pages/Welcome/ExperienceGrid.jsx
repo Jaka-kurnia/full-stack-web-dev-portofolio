@@ -11,15 +11,15 @@ export default function ExperienceGrid({ items, emptyMessage }) {
                                 <img src={`/storage/${exp.image_path}`} alt={exp.company_name} className="w-full h-full object-contain" />
                             </div>
                         ) : (
-                            <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-[#131726] border border-gray-700 flex items-center justify-center p-2 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                <span className="text-gray-500 font-bold text-center text-xs">{exp.company_name}</span>
+                            <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-gray-100 dark:bg-[#131726] border border-gray-300 dark:border-gray-700 flex items-center justify-center p-2 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                <span className="text-gray-600 dark:text-gray-500 font-bold text-center text-xs">{exp.company_name}</span>
                             </div>
                         )}
                     </div>
                     <span className="text-xs md:text-sm font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full">{new Date(exp.start_date).getFullYear()} - {exp.end_date ? new Date(exp.end_date).getFullYear() : 'Sekarang'}</span>
                 </div>
             )) : (
-                <p className="text-gray-600 text-sm italic">{emptyMessage}</p>
+                <p className="text-gray-500 dark:text-gray-600 text-sm italic">{emptyMessage}</p>
             )}
         </div>
     );

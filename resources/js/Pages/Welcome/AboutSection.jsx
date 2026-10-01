@@ -11,9 +11,9 @@ export default function AboutSection({ hero, programmingSkills, softwareSkills, 
     return (
         <section id="about" className="flex flex-col lg:flex-row gap-12 lg:gap-20 mb-32 pt-10">
             {/* Left: Photo Card */}
-            <div className="lg:w-1/3 animate-fade-in-up delay-100">
-                <div className="bg-[#131726] border border-gray-800/60 rounded-[2rem] p-4 h-full flex flex-col justify-end min-h-[450px] relative overflow-hidden group shadow-2xl">
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-transparent to-transparent opacity-60 z-10 pointer-events-none"></div>
+            <div className="lg:w-1/3" data-aos="fade-up" data-aos-delay="100">
+                <div className="bg-white dark:bg-[#131726] border border-gray-200 dark:border-gray-800/60 rounded-[2rem] p-4 h-full flex flex-col justify-end min-h-[450px] relative overflow-hidden group shadow-2xl">
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-[#0B0F19] via-transparent to-transparent opacity-60 z-10 pointer-events-none"></div>
                     {hero?.profile_image_path ? (
                         <img src={`/storage/${hero.profile_image_path}`} alt={hero.full_name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                     ) : (
@@ -23,21 +23,21 @@ export default function AboutSection({ hero, programmingSkills, softwareSkills, 
             </div>
 
             {/* Right: Content */}
-            <div className="lg:w-2/3 flex flex-col justify-center animate-fade-in-left delay-200">
+            <div className="lg:w-2/3 flex flex-col justify-center" data-aos="fade-left" data-aos-delay="200">
                 <h2 className="text-4xl md:text-5xl font-bold mb-6 text-indigo-500 tracking-tight">
                     Tentang Saya
                 </h2>
-                <p className="text-gray-300 leading-relaxed text-lg mb-10 text-justify">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg mb-10 text-justify">
                     {hero?.about_text || 'Mahasiswa Aktif yang berfokus pada pengembangan aplikasi berbasis web.'}
                 </p>
 
                 {/* Tabs Navigation */}
-                <div className="flex gap-6 border-b border-gray-800/80 mb-8 overflow-x-auto pb-1 tabs-scroll">
+                <div className="flex gap-6 border-b border-gray-300 dark:border-gray-800/80 mb-8 overflow-x-auto pb-1 tabs-scroll">
                     {TABS.map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`pb-3 text-sm font-semibold whitespace-nowrap transition-all duration-300 relative ${activeTab === tab ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                            className={`pb-3 text-sm font-semibold whitespace-nowrap transition-all duration-300 relative ${activeTab === tab ? 'text-black dark:text-white' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-300'}`}
                         >
                             {tab}
                             {activeTab === tab && (
