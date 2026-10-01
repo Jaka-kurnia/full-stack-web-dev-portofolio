@@ -2,70 +2,55 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SkillRequest;
 use App\Models\Skill;
-use Illuminate\Http\Request;
+use App\Services\MediaStorage;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Storage;
+use Inertia\Response;
 
 class SkillController extends Controller
 {
-    public function index()
+    public function __construct(private readonly MediaStorage $media) {}
+
+    public function index(): Response
     {
-        $skills = Skill::orderBy('category')->orderBy('proficiency_level', 'desc')->get();
         return Inertia::render('Admin/Skill/Index', [
-            'skills' => $skills
+            'skills' => Skill::query()->ordered()->get(),
+            'categories' => config('portfolio.skill_categories'),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(SkillRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'icon_identifier' => 'nullable|string|max:255',
-            'proficiency_level' => 'required|integer|min:0|max:100',
-            'image' => 'nullable|image|max:2048',
-        ]);
+        Skill::create($this->media->withUpload(
+            data: $request->validated(),
+            field: 'image',
+            pathField: 'image_path',
+            directory: config('portfolio.directories.skills'),
+        ));
 
-        $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : true;
-
-        if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('skills', 'public');
-        }
-
-        Skill::create($validated);
-        return redirect()->back()->with('success', 'Skill added successfully.');
+        return back()->with('success', 'Skill added successfully.');
     }
 
-    public function update(Request $request, Skill $skill)
+    public function update(SkillRequest $request, Skill $skill): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'icon_identifier' => 'nullable|string|max:255',
-            'proficiency_level' => 'required|integer|min:0|max:100',
-            'image' => 'nullable|image|max:2048',
-        ]);
+        $skill->update($this->media->withUpload(
+            data: $request->validated(),
+            field: 'image',
+            pathField: 'image_path',
+            directory: config('portfolio.directories.skills'),
+            currentPath: $skill->image_path,
+        ));
 
-        $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : true;
-
-        if ($request->hasFile('image')) {
-            if ($skill->image_path) {
-                Storage::disk('public')->delete($skill->image_path);
-            }
-            $validated['image_path'] = $request->file('image')->store('skills', 'public');
-        }
-
-        $skill->update($validated);
-        return redirect()->back()->with('success', 'Skill updated successfully.');
+        return back()->with('success', 'Skill updated successfully.');
     }
 
-    public function destroy(Skill $skill)
+    public function destroy(Skill $skill): RedirectResponse
     {
-        if ($skill->image_path) {
-            Storage::disk('public')->delete($skill->image_path);
-        }
+        $this->media->delete($skill->image_path);
         $skill->delete();
-        return redirect()->back()->with('success', 'Skill deleted successfully.');
+
+        return back()->with('success', 'Skill deleted successfully.');
     }
 }

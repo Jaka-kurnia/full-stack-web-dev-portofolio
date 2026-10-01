@@ -2,123 +2,127 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\ProjectRequest;
+use App\Models\Project;
+use App\Models\Skill;
+use App\Services\MediaStorage;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ProjectController extends Controller
 {
-    public function index()
+    public function __construct(private readonly MediaStorage $media) {}
+
+    public function index(): Response
     {
-        $projects = \App\Models\Project::with('skills')->orderBy('created_at', 'desc')->get();
-        return inertia('Admin/Project/Index', [
-            'projects' => $projects
+        return Inertia::render('Admin/Project/Index', [
+            'projects' => Project::with('skills')->latest()->get(),
+            'statuses' => config('portfolio.project_statuses'),
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
-        return inertia('Admin/Project/Form', [
-            'project' => new \App\Models\Project(),
-            'allSkills' => \App\Models\Skill::where('is_active', true)->get(),
+        return Inertia::render('Admin/Project/Form', [
+            'project' => new Project,
+            'allSkills' => $this->selectableSkills(),
+            'statuses' => config('portfolio.project_statuses'),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(ProjectRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:projects',
-            'content' => 'nullable|string',
-            'demo_url' => 'nullable|url|max:255',
-            'github_url' => 'nullable|url|max:255',
-            'is_featured' => 'boolean',
-            'status' => 'required|in:Draft,Published',
-            'thumbnail' => 'nullable|image|max:2048',
-            'skills' => 'nullable|array',
-            'galleries.*' => 'image|max:2048',
-        ]);
+        $payload = $this->payload($request);
 
-        if ($request->hasFile('thumbnail')) {
-            $validated['thumbnail_path'] = $request->file('thumbnail')->store('projects', 'public');
-        }
+        $project = Project::create($payload['attributes']);
+        $project->skills()->sync($payload['skills']);
+        $this->storeGalleries($project, $payload['galleries']);
 
-        $project = \App\Models\Project::create($validated);
-
-        if ($request->has('skills')) {
-            $project->skills()->sync($request->skills);
-        }
-
-        if ($request->hasFile('galleries')) {
-            foreach ($request->file('galleries') as $index => $image) {
-                $path = $image->store('projects/galleries', 'public');
-                $project->galleries()->create([
-                    'image_path' => $path,
-                    'order' => $index,
-                ]);
-            }
-        }
-
-        return redirect()->route('admin.projects.index')->with('success', 'Project created successfully.');
+        return redirect()->route('admin.projects.index')
+            ->with('success', 'Project created successfully.');
     }
 
-    public function edit(\App\Models\Project $project)
+    public function edit(Project $project): Response
     {
-        $project->load('skills', 'galleries');
-        return inertia('Admin/Project/Form', [
+        $project->load(['skills', 'galleries']);
+
+        return Inertia::render('Admin/Project/Form', [
             'project' => $project,
-            'allSkills' => \App\Models\Skill::where('is_active', true)->get(),
+            'allSkills' => $this->selectableSkills(),
+            'statuses' => config('portfolio.project_statuses'),
         ]);
     }
 
-    public function update(Request $request, \App\Models\Project $project)
+    public function update(ProjectRequest $request, Project $project): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:projects,slug,' . $project->id,
-            'content' => 'nullable|string',
-            'demo_url' => 'nullable|url|max:255',
-            'github_url' => 'nullable|url|max:255',
-            'is_featured' => 'boolean',
-            'status' => 'required|in:Draft,Published',
-            'thumbnail' => 'nullable|image|max:2048',
-            'skills' => 'nullable|array',
-            'galleries.*' => 'image|max:2048',
-        ]);
+        $payload = $this->payload($request, $project);
 
-        if ($request->hasFile('thumbnail')) {
-            if ($project->thumbnail_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($project->thumbnail_path);
-            }
-            $validated['thumbnail_path'] = $request->file('thumbnail')->store('projects', 'public');
-        }
+        $project->update($payload['attributes']);
+        $project->skills()->sync($payload['skills']);
+        $this->storeGalleries($project, $payload['galleries']);
 
-        $project->update($validated);
-
-        if ($request->has('skills')) {
-            $project->skills()->sync($request->skills);
-        }
-
-        if ($request->hasFile('galleries')) {
-            foreach ($request->file('galleries') as $index => $image) {
-                $path = $image->store('projects/galleries', 'public');
-                $project->galleries()->create([
-                    'image_path' => $path,
-                    'order' => $project->galleries()->count() + $index,
-                ]);
-            }
-        }
-
-        return redirect()->route('admin.projects.index')->with('success', 'Project updated successfully.');
+        return redirect()->route('admin.projects.index')
+            ->with('success', 'Project updated successfully.');
     }
 
-    public function destroy(\App\Models\Project $project)
+    public function destroy(Project $project): RedirectResponse
     {
-        if ($project->thumbnail_path) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($project->thumbnail_path);
-        }
-        foreach ($project->galleries as $gallery) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($gallery->image_path);
-        }
+        $this->media->delete($project->thumbnail_path);
+        $this->media->deleteAll($project->galleries->pluck('image_path'));
+
         $project->delete();
-        return redirect()->back()->with('success', 'Project deleted successfully.');
+
+        return redirect()->route('admin.projects.index')
+            ->with('success', 'Project deleted successfully.');
+    }
+
+    /**
+     * Pisahkan atribut yang boleh di-mass-assign dari data relasi/file,
+     * sekaligus tangani penggantian thumbnail.
+     *
+     * @return array{attributes: array<string, mixed>, skills: array<int, int>, galleries: array<int, UploadedFile>}
+     */
+    private function payload(ProjectRequest $request, ?Project $project = null): array
+    {
+        $data = $request->validated();
+        $skills = $data['skills'];
+        $galleries = $data['galleries'];
+        unset($data['skills'], $data['galleries']);
+
+        return [
+            'attributes' => $this->media->withUpload(
+                data: $data,
+                field: 'thumbnail',
+                pathField: 'thumbnail_path',
+                directory: config('portfolio.directories.projects'),
+                currentPath: $project?->thumbnail_path,
+            ),
+            'skills' => $skills,
+            'galleries' => $galleries,
+        ];
+    }
+
+    /**
+     * @param  array<int, UploadedFile>  $files
+     */
+    private function storeGalleries(Project $project, array $files): void
+    {
+        // Baca order tertinggi sekali sebelum loop: nilai yang dihitung di
+        // dalam loop akan basi karena baris sudah terlanjur ter-insert.
+        $order = (int) $project->galleries->max('order') + 1;
+
+        foreach ($this->media->storeMany($files, config('portfolio.directories.project_galleries')) as $path) {
+            $project->galleries()->create([
+                'image_path' => $path,
+                'order' => $order++,
+            ]);
+        }
+    }
+
+    private function selectableSkills()
+    {
+        return Skill::query()->active()->get();
     }
 }

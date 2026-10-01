@@ -1,22 +1,19 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import ConfirmDeleteModal from '@/Components/Admin/ConfirmDeleteModal';
+import EmptyRow from '@/Components/Admin/EmptyRow';
+import FileField from '@/Components/Admin/FileField';
+import FormField from '@/Components/Admin/FormField';
+import PageContainer from '@/Components/Admin/PageContainer';
 import Modal from '@/Components/Modal';
+import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
-import DangerButton from '@/Components/DangerButton';
 import Table from '@/Components/Table';
-import { useState } from 'react';
+import TextInput from '@/Components/TextInput';
+import useCrudModal from '@/Hooks/useCrudModal';
 
 export default function Index({ certifications }) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [editingCert, setEditingCert] = useState(null);
-    const [deletingCert, setDeletingCert] = useState(null);
-
-    const { data, setData, post, delete: destroy, processing, errors, reset, clearErrors } = useForm({
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         name: '',
         issuer: '',
         issue_date: '',
@@ -26,10 +23,9 @@ export default function Index({ certifications }) {
         _method: 'POST',
     });
 
-    const openModal = (cert = null) => {
+    const prepare = (cert = null) => {
         clearErrors();
         if (cert) {
-            setEditingCert(cert);
             setData({
                 name: cert.name,
                 issuer: cert.issuer,
@@ -40,135 +36,98 @@ export default function Index({ certifications }) {
                 _method: 'PUT',
             });
         } else {
-            setEditingCert(null);
             reset();
             setData('_method', 'POST');
         }
-        setIsModalOpen(true);
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setTimeout(() => {
-            reset();
-            setEditingCert(null);
-        }, 200);
-    };
+    const crud = useCrudModal({ prepare, reset });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (editingCert) {
+        if (crud.editing) {
             setData('_method', 'PUT');
-            post(route('admin.certifications.update', editingCert.id), {
-                onSuccess: () => closeModal(),
+            post(route('admin.certifications.update', crud.editing.id), {
+                onSuccess: () => crud.closeForm(),
                 forceFormData: true,
             });
         } else {
             setData('_method', 'POST');
             post(route('admin.certifications.store'), {
-                onSuccess: () => closeModal(),
+                onSuccess: () => crud.closeForm(),
                 forceFormData: true,
             });
         }
     };
 
-    const openDeleteModal = (cert) => {
-        setDeletingCert(cert);
-        setIsDeleteModalOpen(true);
-    };
-
-    const closeDeleteModal = () => {
-        setIsDeleteModalOpen(false);
-        setTimeout(() => setDeletingCert(null), 200);
-    };
-
-    const handleDelete = () => {
-        destroy(route('admin.certifications.destroy', deletingCert.id), {
-            onSuccess: () => closeDeleteModal(),
-        });
-    };
-
     return (
-        <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Sertifikasi Management</h2>}
-        >
+        <AuthenticatedLayout title="Sertifikasi Management">
             <Head title="Sertifikasi" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    
-                    <div className="mb-6 flex justify-end">
-                        <PrimaryButton onClick={() => openModal()}>
-                            Tambah Sertifikasi
-                        </PrimaryButton>
-                    </div>
-
-                    <Table>
-                        <Table.Header>
-                            <Table.HeaderCell>Badge</Table.HeaderCell>
-                            <Table.HeaderCell>Sertifikasi</Table.HeaderCell>
-                            <Table.HeaderCell>Penerbit</Table.HeaderCell>
-                            <Table.HeaderCell>Tanggal</Table.HeaderCell>
-                            <Table.HeaderCell>Aksi</Table.HeaderCell>
-                        </Table.Header>
-                        <Table.Body>
-                            {certifications.map((cert) => (
-                                <Table.Row key={cert.id}>
-                                    <Table.Cell>
-                                        {cert.badge_image_path ? (
-                                            <img src={`/storage/${cert.badge_image_path}`} alt="Badge" className="w-12 h-12 rounded object-cover" />
-                                        ) : (
-                                            <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center text-gray-400 text-xs">No Img</div>
+            <PageContainer
+                actions={
+                    <PrimaryButton onClick={() => crud.openForm()}>
+                        Tambah Sertifikasi
+                    </PrimaryButton>
+                }
+            >
+                <Table>
+                    <Table.Header>
+                        <Table.HeaderCell>Badge</Table.HeaderCell>
+                        <Table.HeaderCell>Sertifikasi</Table.HeaderCell>
+                        <Table.HeaderCell>Penerbit</Table.HeaderCell>
+                        <Table.HeaderCell>Tanggal</Table.HeaderCell>
+                        <Table.HeaderCell>Aksi</Table.HeaderCell>
+                    </Table.Header>
+                    <Table.Body>
+                        {certifications.map((cert) => (
+                            <Table.Row key={cert.id}>
+                                <Table.Cell>
+                                    {cert.badge_image_path ? (
+                                        <img src={`/storage/${cert.badge_image_path}`} alt="Badge" className="w-12 h-12 rounded object-cover" />
+                                    ) : (
+                                        <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center text-gray-400 text-xs">No Img</div>
+                                    )}
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <div className="font-bold text-gray-900">{cert.name}</div>
+                                    {cert.credential_url && (
+                                        <a href={cert.credential_url} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 hover:underline">
+                                            Lihat Kredensial
+                                        </a>
+                                    )}
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <div className="text-sm text-gray-900">{cert.issuer}</div>
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <div className="text-sm text-gray-900">
+                                        Terbit: {new Date(cert.issue_date).toLocaleDateString()}
+                                        {cert.expiration_date && (
+                                            <div className="text-xs text-gray-500">Exp: {new Date(cert.expiration_date).toLocaleDateString()}</div>
                                         )}
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <div className="font-bold text-gray-900">{cert.name}</div>
-                                        {cert.credential_url && (
-                                            <a href={cert.credential_url} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 hover:underline">
-                                                Lihat Kredensial
-                                            </a>
-                                        )}
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <div className="text-sm text-gray-900">{cert.issuer}</div>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <div className="text-sm text-gray-900">
-                                            Terbit: {new Date(cert.issue_date).toLocaleDateString()}
-                                            {cert.expiration_date && (
-                                                <div className="text-xs text-gray-500">Exp: {new Date(cert.expiration_date).toLocaleDateString()}</div>
-                                            )}
-                                        </div>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <button onClick={() => openModal(cert)} className="text-blue-600 hover:text-blue-900 mr-4 font-medium">Edit</button>
-                                        <button onClick={() => openDeleteModal(cert)} className="text-red-600 hover:text-red-900 font-medium">Hapus</button>
-                                    </Table.Cell>
-                                </Table.Row>
-                            ))}
-                            {certifications.length === 0 && (
-                                <Table.Row>
-                                    <Table.Cell className="text-center text-gray-500 py-8" colSpan="5">
-                                        Belum ada sertifikasi.
-                                    </Table.Cell>
-                                </Table.Row>
-                            )}
-                        </Table.Body>
-                    </Table>
-
-                </div>
-            </div>
+                                    </div>
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <button onClick={() => crud.openForm(cert)} className="text-blue-600 hover:text-blue-900 mr-4 font-medium">Edit</button>
+                                    <button onClick={() => crud.openDelete(cert)} className="text-red-600 hover:text-red-900 font-medium">Hapus</button>
+                                </Table.Cell>
+                            </Table.Row>
+                        ))}
+                        {certifications.length === 0 && <EmptyRow colSpan={5} message="Belum ada sertifikasi." />}
+                    </Table.Body>
+                </Table>
+            </PageContainer>
 
             {/* Modal Tambah/Edit */}
-            <Modal show={isModalOpen} onClose={closeModal}>
+            <Modal show={crud.isFormOpen} onClose={crud.closeForm}>
                 <form onSubmit={handleSubmit} className="p-6">
                     <h2 className="text-lg font-medium text-gray-900 mb-6">
-                        {editingCert ? 'Edit Sertifikasi' : 'Tambah Sertifikasi'}
+                        {crud.editing ? 'Edit Sertifikasi' : 'Tambah Sertifikasi'}
                     </h2>
 
                     <div className="space-y-4">
-                        <div>
-                            <InputLabel htmlFor="name" value="Nama Sertifikasi" />
+                        <FormField label="Nama Sertifikasi" htmlFor="name" error={errors.name}>
                             <TextInput
                                 id="name"
                                 className="mt-1 block w-full"
@@ -176,11 +135,9 @@ export default function Index({ certifications }) {
                                 onChange={(e) => setData('name', e.target.value)}
                                 required
                             />
-                            <InputError className="mt-2" message={errors.name} />
-                        </div>
+                        </FormField>
 
-                        <div>
-                            <InputLabel htmlFor="issuer" value="Penerbit (Issuer)" />
+                        <FormField label="Penerbit (Issuer)" htmlFor="issuer" error={errors.issuer}>
                             <TextInput
                                 id="issuer"
                                 className="mt-1 block w-full"
@@ -188,12 +145,10 @@ export default function Index({ certifications }) {
                                 onChange={(e) => setData('issuer', e.target.value)}
                                 required
                             />
-                            <InputError className="mt-2" message={errors.issuer} />
-                        </div>
-                        
+                        </FormField>
+
                         <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <InputLabel htmlFor="issue_date" value="Tanggal Terbit" />
+                            <FormField label="Tanggal Terbit" htmlFor="issue_date" error={errors.issue_date}>
                                 <TextInput
                                     id="issue_date"
                                     type="date"
@@ -202,11 +157,9 @@ export default function Index({ certifications }) {
                                     onChange={(e) => setData('issue_date', e.target.value)}
                                     required
                                 />
-                                <InputError className="mt-2" message={errors.issue_date} />
-                            </div>
+                            </FormField>
 
-                            <div>
-                                <InputLabel htmlFor="expiration_date" value="Tanggal Kedaluwarsa (Opsional)" />
+                            <FormField label="Tanggal Kedaluwarsa (Opsional)" htmlFor="expiration_date" error={errors.expiration_date}>
                                 <TextInput
                                     id="expiration_date"
                                     type="date"
@@ -214,54 +167,43 @@ export default function Index({ certifications }) {
                                     value={data.expiration_date}
                                     onChange={(e) => setData('expiration_date', e.target.value)}
                                 />
-                                <InputError className="mt-2" message={errors.expiration_date} />
-                            </div>
+                            </FormField>
                         </div>
 
-                        <div>
-                            <InputLabel htmlFor="credential_url" value="URL Kredensial (Opsional)" />
+                        <FormField label="URL Kredensial (Opsional)" htmlFor="credential_url" error={errors.credential_url}>
                             <TextInput
                                 id="credential_url"
                                 className="mt-1 block w-full"
                                 value={data.credential_url}
                                 onChange={(e) => setData('credential_url', e.target.value)}
                             />
-                            <InputError className="mt-2" message={errors.credential_url} />
-                        </div>
+                        </FormField>
 
-                        <div>
-                            <InputLabel htmlFor="badge_image" value="Gambar/Badge Sertifikat (Opsional)" />
-                            <input
-                                id="badge_image"
-                                type="file"
-                                accept="image/*"
-                                className="mt-1 block w-full border border-gray-300 rounded p-2 text-sm"
-                                onChange={(e) => setData('badge_image', e.target.files[0])}
-                            />
-                            <InputError className="mt-2" message={errors.badge_image} />
-                        </div>
+                        <FileField
+                            label="Gambar/Badge Sertifikat (Opsional)"
+                            htmlFor="badge_image"
+                            error={errors.badge_image}
+                            onChange={(e) => setData('badge_image', e.target.files[0])}
+                        />
                     </div>
 
                     <div className="mt-6 flex justify-end gap-3">
-                        <SecondaryButton onClick={closeModal}>Batal</SecondaryButton>
+                        <SecondaryButton onClick={crud.closeForm}>Batal</SecondaryButton>
                         <PrimaryButton disabled={processing}>
-                            {editingCert ? 'Simpan Perubahan' : 'Tambah'}
+                            {crud.editing ? 'Simpan Perubahan' : 'Tambah'}
                         </PrimaryButton>
                     </div>
                 </form>
             </Modal>
 
             {/* Modal Hapus */}
-            <Modal show={isDeleteModalOpen} onClose={closeDeleteModal} maxWidth="sm">
-                <div className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Konfirmasi Hapus</h2>
-                    <p className="text-sm text-gray-600 mb-6">Apakah Anda yakin ingin menghapus data ini?</p>
-                    <div className="flex justify-end gap-3">
-                        <SecondaryButton onClick={closeDeleteModal}>Batal</SecondaryButton>
-                        <DangerButton onClick={handleDelete} disabled={processing}>Hapus</DangerButton>
-                    </div>
-                </div>
-            </Modal>
+            <ConfirmDeleteModal
+                show={crud.isDeleteOpen}
+                onCancel={crud.closeDelete}
+                onConfirm={() => crud.confirmDelete(route('admin.certifications.destroy', crud.deleting.id))}
+                processing={processing}
+                message="Apakah Anda yakin ingin menghapus data ini?"
+            />
         </AuthenticatedLayout>
     );
 }

@@ -2,19 +2,20 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\HeroSetting;
-use App\Models\Experience;
-use App\Models\Skill;
 use App\Models\Certification;
+use App\Models\Experience;
+use App\Models\HeroSetting;
 use App\Models\Quote;
+use App\Models\Skill;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class PortfolioSeeder extends Seeder
 {
     public function run(): void
     {
-        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        Schema::disableForeignKeyConstraints();
 
         // 1. Hero Setting
         HeroSetting::truncate();
@@ -28,7 +29,7 @@ class PortfolioSeeder extends Seeder
                 'linkedin' => 'http://www.linkedin.com/in/jaka-kurnia',
                 'email' => 'kurniajakaa@gmail.com',
                 'phone' => '081220398391',
-                'address' => 'Kampung Cipanengah Girang, RT 001, RW 004 Kecamatan Sukaratu, Kabupaten Tasikmalaya'
+                'address' => 'Kampung Cipanengah Girang, RT 001, RW 004 Kecamatan Sukaratu, Kabupaten Tasikmalaya',
             ],
             'cta_text' => 'Hubungi Saya',
             'cta_link' => 'mailto:kurniajakaa@gmail.com',
@@ -84,6 +85,17 @@ class PortfolioSeeder extends Seeder
             ['name' => 'Figma', 'category' => 'Tools', 'proficiency_level' => 85, 'icon_identifier' => 'figma'],
             ['name' => 'MS Word', 'category' => 'Tools', 'proficiency_level' => 90, 'icon_identifier' => 'word'],
             ['name' => 'MS Excel', 'category' => 'Tools', 'proficiency_level' => 85, 'icon_identifier' => 'excel'],
+            ['name' => 'Canva', 'category' => 'Tools', 'proficiency_level' => 80, 'icon_identifier' => 'canva'],
+            ['name' => 'Composer', 'category' => 'Backend', 'proficiency_level' => 75, 'icon_identifier' => 'composer'],
+            ['name' => 'ASP.NET Core', 'category' => 'Backend', 'proficiency_level' => 70, 'icon_identifier' => 'dotnetcore'],
+            ['name' => 'FilamentPHP', 'category' => 'Backend', 'proficiency_level' => 75, 'icon_identifier' => 'filamentphp'],
+            ['name' => 'FastAPI', 'category' => 'Backend', 'proficiency_level' => 70, 'icon_identifier' => 'fastapi'],
+            ['name' => 'GitHub', 'category' => 'Tools', 'proficiency_level' => 85, 'icon_identifier' => 'github'],
+            ['name' => 'Java', 'category' => 'Backend', 'proficiency_level' => 70, 'icon_identifier' => 'java'],
+            ['name' => 'jQuery', 'category' => 'Frontend', 'proficiency_level' => 75, 'icon_identifier' => 'jquery'],
+            ['name' => 'Livewire', 'category' => 'Backend', 'proficiency_level' => 75, 'icon_identifier' => 'livewire'],
+            ['name' => 'npm', 'category' => 'Tools', 'proficiency_level' => 80, 'icon_identifier' => 'npm'],
+            ['name' => 'Postman', 'category' => 'Tools', 'proficiency_level' => 80, 'icon_identifier' => 'postman'],
         ];
 
         foreach ($skills as $skill) {
@@ -111,6 +123,6 @@ class PortfolioSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+        Schema::enableForeignKeyConstraints();
     }
 }

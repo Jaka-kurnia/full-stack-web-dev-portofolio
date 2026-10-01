@@ -16,8 +16,11 @@ const Header = ({ children }) => (
     </thead>
 );
 
-const HeaderCell = ({ children, className = '' }) => (
-    <th className={`px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider ${className}`}>
+const HeaderCell = ({ children, className = '', ...props }) => (
+    <th
+        {...props}
+        className={`px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider ${className}`}
+    >
         {children}
     </th>
 );
@@ -28,14 +31,17 @@ const Body = ({ children }) => (
     </tbody>
 );
 
-const Row = ({ children, className = '' }) => (
-    <tr className={`hover:bg-gray-50 transition-colors ${className}`}>
+const Row = ({ children, className = '', ...props }) => (
+    <tr {...props} className={`hover:bg-gray-50 transition-colors ${className}`}>
         {children}
     </tr>
 );
 
-const Cell = ({ children, className = '' }) => (
-    <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-700 ${className}`}>
+const Cell = ({ children, className = '', ...props }) => (
+    <td
+        {...props}
+        className={`px-6 py-4 whitespace-nowrap text-sm text-gray-700 ${className}`}
+    >
         {children}
     </td>
 );

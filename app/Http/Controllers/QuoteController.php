@@ -2,43 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
+use App\Http\Requests\QuoteRequest;
 use App\Models\Quote;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class QuoteController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
-        $quotes = Quote::all();
-        return inertia('Admin/Quote/Index', ['quotes' => $quotes]);
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'content' => 'required|string',
-            'is_active' => 'boolean'
+        return Inertia::render('Admin/Quote/Index', [
+            'quotes' => Quote::all(),
         ]);
-
-        Quote::create($validated);
-        return redirect()->back()->with('success', 'Quote created.');
     }
 
-    public function update(Request $request, Quote $quote)
+    public function store(QuoteRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'content' => 'required|string',
-            'is_active' => 'boolean'
-        ]);
+        Quote::create($request->validated());
 
-        $quote->update($validated);
-        return redirect()->back()->with('success', 'Quote updated.');
+        return back()->with('success', 'Quote created.');
     }
 
-    public function destroy(Quote $quote)
+    public function update(QuoteRequest $request, Quote $quote): RedirectResponse
+    {
+        $quote->update($request->validated());
+
+        return back()->with('success', 'Quote updated.');
+    }
+
+    public function destroy(Quote $quote): RedirectResponse
     {
         $quote->delete();
-        return redirect()->back()->with('success', 'Quote deleted.');
+
+        return back()->with('success', 'Quote deleted.');
     }
 }

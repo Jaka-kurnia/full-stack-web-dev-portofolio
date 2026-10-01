@@ -2,68 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\ExperienceRequest;
+use App\Models\Experience;
+use App\Services\MediaStorage;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ExperienceController extends Controller
 {
-    public function index()
+    public function __construct(private readonly MediaStorage $media) {}
+
+    public function index(): Response
     {
-        $experiences = \App\Models\Experience::orderBy('start_date', 'desc')->get();
-        return inertia('Admin/Experience/Index', [
-            'experiences' => $experiences
+        return Inertia::render('Admin/Experience/Index', [
+            'experiences' => Experience::query()->latest('start_date')->get(),
+            'types' => config('portfolio.experience_types'),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(ExperienceRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'company_name' => 'required|string|max:255',
-            'job_title' => 'required|string|max:255',
-            'type' => 'required|in:Full-time,Freelance',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
-            'is_active' => 'boolean',
-        ]);
+        Experience::create($this->media->withUpload(
+            data: $request->validated(),
+            field: 'image',
+            pathField: 'image_path',
+            directory: config('portfolio.directories.experiences'),
+        ));
 
-        if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('experiences', 'public');
-        }
-
-        \App\Models\Experience::create($validated);
-
-        return redirect()->back()->with('success', 'Experience added successfully.');
+        return back()->with('success', 'Experience added successfully.');
     }
 
-    public function update(Request $request, \App\Models\Experience $experience)
+    public function update(ExperienceRequest $request, Experience $experience): RedirectResponse
     {
-        $validated = $request->validate([
-            'company_name' => 'required|string|max:255',
-            'job_title' => 'required|string|max:255',
-            'type' => 'required|in:Full-time,Freelance',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
-            'is_active' => 'boolean',
-        ]);
+        $experience->update($this->media->withUpload(
+            data: $request->validated(),
+            field: 'image',
+            pathField: 'image_path',
+            directory: config('portfolio.directories.experiences'),
+            currentPath: $experience->image_path,
+        ));
 
-        if ($request->hasFile('image')) {
-            if ($experience->image_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($experience->image_path);
-            }
-            $validated['image_path'] = $request->file('image')->store('experiences', 'public');
-        }
-
-        $experience->update($validated);
-
-        return redirect()->back()->with('success', 'Experience updated successfully.');
+        return back()->with('success', 'Experience updated successfully.');
     }
 
-    public function destroy(\App\Models\Experience $experience)
+    public function destroy(Experience $experience): RedirectResponse
     {
+        $this->media->delete($experience->image_path);
         $experience->delete();
-        return redirect()->back()->with('success', 'Experience deleted successfully.');
+
+        return back()->with('success', 'Experience deleted successfully.');
     }
 }

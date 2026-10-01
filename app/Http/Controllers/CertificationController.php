@@ -2,67 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\CertificationRequest;
+use App\Models\Certification;
+use App\Services\MediaStorage;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class CertificationController extends Controller
 {
-    public function index()
+    public function __construct(private readonly MediaStorage $media) {}
+
+    public function index(): Response
     {
-        $certifications = \App\Models\Certification::orderBy('issue_date', 'desc')->get();
-        return inertia('Admin/Certification/Index', [
-            'certifications' => $certifications
+        return Inertia::render('Admin/Certification/Index', [
+            'certifications' => Certification::query()->latest('issue_date')->get(),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(CertificationRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'issuer' => 'required|string|max:255',
-            'issue_date' => 'required|date',
-            'expiration_date' => 'nullable|date|after_or_equal:issue_date',
-            'credential_url' => 'nullable|url|max:255',
-            'badge_image' => 'nullable|image|max:2048',
-        ]);
+        Certification::create($this->media->withUpload(
+            data: $request->validated(),
+            field: 'badge_image',
+            pathField: 'badge_image_path',
+            directory: config('portfolio.directories.certifications'),
+        ));
 
-        if ($request->hasFile('badge_image')) {
-            $validated['badge_image_path'] = $request->file('badge_image')->store('certifications', 'public');
-        }
-
-        \App\Models\Certification::create($validated);
-
-        return redirect()->back()->with('success', 'Certification added successfully.');
+        return back()->with('success', 'Certification added successfully.');
     }
 
-    public function update(Request $request, \App\Models\Certification $certification)
+    public function update(CertificationRequest $request, Certification $certification): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'issuer' => 'required|string|max:255',
-            'issue_date' => 'required|date',
-            'expiration_date' => 'nullable|date|after_or_equal:issue_date',
-            'credential_url' => 'nullable|url|max:255',
-            'badge_image' => 'nullable|image|max:2048',
-        ]);
+        $certification->update($this->media->withUpload(
+            data: $request->validated(),
+            field: 'badge_image',
+            pathField: 'badge_image_path',
+            directory: config('portfolio.directories.certifications'),
+            currentPath: $certification->badge_image_path,
+        ));
 
-        if ($request->hasFile('badge_image')) {
-            if ($certification->badge_image_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($certification->badge_image_path);
-            }
-            $validated['badge_image_path'] = $request->file('badge_image')->store('certifications', 'public');
-        }
-
-        $certification->update($validated);
-
-        return redirect()->back()->with('success', 'Certification updated successfully.');
+        return back()->with('success', 'Certification updated successfully.');
     }
 
-    public function destroy(\App\Models\Certification $certification)
+    public function destroy(Certification $certification): RedirectResponse
     {
-        if ($certification->badge_image_path) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($certification->badge_image_path);
-        }
+        $this->media->delete($certification->badge_image_path);
         $certification->delete();
-        return redirect()->back()->with('success', 'Certification deleted successfully.');
+
+        return back()->with('success', 'Certification deleted successfully.');
     }
 }

@@ -1,26 +1,36 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
+import FlashToast from '@/Components/FlashToast';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function AuthenticatedLayout({ header, children }) {
+/**
+ * Satu daftar menu untuk sidebar desktop maupun menu mobile,
+ * sehingga penambahan menu admin cukup dilakukan di satu tempat.
+ */
+const NAV_ITEMS = [
+    { routeName: 'dashboard', label: 'Dashboard' },
+    { routeName: 'admin.hero.edit', label: 'Pengaturan Profil' },
+    { routeName: 'admin.skills.index', label: 'Skill & Software' },
+    { routeName: 'admin.projects.index', label: 'Project', wildcard: true },
+    { routeName: 'admin.experiences.index', label: 'Latar Pendidikan' },
+    { routeName: 'admin.certifications.index', label: 'Sertifikasi' },
+    { routeName: 'admin.quotes.index', label: 'Quotes' },
+];
+
+const isCurrent = ({ routeName, wildcard }) =>
+    route().current(wildcard ? `${routeName}*` : routeName);
+
+export default function AuthenticatedLayout({ title, header, children }) {
     const user = usePage().props.auth.user;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
-    const SidebarLink = ({ href, active, children }) => (
-        <Link
-            href={href}
-            className={`flex items-center px-6 py-3 mt-1 text-sm font-medium transition-colors border-l-4 ${
-                active 
-                    ? 'bg-blue-900 border-yellow-400 text-yellow-400' 
-                    : 'border-transparent text-blue-200 hover:bg-blue-700 hover:text-white'
-            }`}
-        >
-            {children}
-        </Link>
-    );
+    const resolvedHeader =
+        header ??
+        (title ? (
+            <h2 className="font-semibold text-xl text-gray-800 leading-tight">{title}</h2>
+        ) : null);
 
     return (
         <div className="flex min-h-screen bg-gray-100">
@@ -35,27 +45,19 @@ export default function AuthenticatedLayout({ header, children }) {
 
                 <div className="flex flex-col flex-1 py-4 overflow-y-auto">
                     <nav className="flex-1">
-                        <SidebarLink href={route('dashboard')} active={route().current('dashboard')}>
-                            Dashboard
-                        </SidebarLink>
-                        <SidebarLink href={route('admin.hero.edit')} active={route().current('admin.hero.edit')}>
-                            Pengaturan Profil
-                        </SidebarLink>
-                        <SidebarLink href={route('admin.skills.index')} active={route().current('admin.skills.index')}>
-                            Skill & Software
-                        </SidebarLink>
-                        <SidebarLink href={route('admin.projects.index')} active={route().current('admin.projects.index*')}>
-                            Project
-                        </SidebarLink>
-                        <SidebarLink href={route('admin.experiences.index')} active={route().current('admin.experiences.index')}>
-                            Latar Pendidikan
-                        </SidebarLink>
-                        <SidebarLink href={route('admin.certifications.index')} active={route().current('admin.certifications.index')}>
-                            Sertifikasi
-                        </SidebarLink>
-                        <SidebarLink href={route('admin.quotes.index')} active={route().current('admin.quotes.index')}>
-                            Quotes
-                        </SidebarLink>
+                        {NAV_ITEMS.map((item) => (
+                            <Link
+                                key={item.routeName}
+                                href={route(item.routeName)}
+                                className={`flex items-center px-6 py-3 mt-1 text-sm font-medium transition-colors border-l-4 ${
+                                    isCurrent(item)
+                                        ? 'bg-blue-900 border-yellow-400 text-yellow-400'
+                                        : 'border-transparent text-blue-200 hover:bg-blue-700 hover:text-white'
+                                }`}
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
                     </nav>
                 </div>
             </aside>
@@ -64,7 +66,6 @@ export default function AuthenticatedLayout({ header, children }) {
             <div className="flex flex-col flex-1 w-full">
                 {/* Topbar */}
                 <header className="flex items-center justify-between h-16 px-6 bg-white border-b border-gray-200 md:justify-end">
-                    
                     {/* Mobile menu button & logo */}
                     <div className="flex items-center md:hidden">
                         <button
@@ -122,13 +123,15 @@ export default function AuthenticatedLayout({ header, children }) {
                 {showingNavigationDropdown && (
                     <div className="md:hidden bg-white border-b border-gray-200">
                         <div className="pt-2 pb-3 space-y-1">
-                            <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>Dashboard</ResponsiveNavLink>
-                            <ResponsiveNavLink href={route('admin.hero.edit')} active={route().current('admin.hero.edit')}>Pengaturan Profil</ResponsiveNavLink>
-                            <ResponsiveNavLink href={route('admin.skills.index')} active={route().current('admin.skills.index')}>Skill & Software</ResponsiveNavLink>
-                            <ResponsiveNavLink href={route('admin.projects.index')} active={route().current('admin.projects.index*')}>Project</ResponsiveNavLink>
-                            <ResponsiveNavLink href={route('admin.experiences.index')} active={route().current('admin.experiences.index')}>Latar Pendidikan</ResponsiveNavLink>
-                            <ResponsiveNavLink href={route('admin.certifications.index')} active={route().current('admin.certifications.index')}>Sertifikasi</ResponsiveNavLink>
-                            <ResponsiveNavLink href={route('admin.quotes.index')} active={route().current('admin.quotes.index')}>Quotes</ResponsiveNavLink>
+                            {NAV_ITEMS.map((item) => (
+                                <ResponsiveNavLink
+                                    key={item.routeName}
+                                    href={route(item.routeName)}
+                                    active={isCurrent(item)}
+                                >
+                                    {item.label}
+                                </ResponsiveNavLink>
+                            ))}
                         </div>
                         <div className="pt-4 pb-1 border-t border-gray-200">
                             <div className="px-4">
@@ -145,10 +148,11 @@ export default function AuthenticatedLayout({ header, children }) {
 
                 {/* Page Content */}
                 <div className="flex-1 overflow-y-auto">
-                    {header && (
+                    <FlashToast />
+                    {resolvedHeader && (
                         <header className="bg-white shadow">
                             <div className="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                                {header}
+                                {resolvedHeader}
                             </div>
                         </header>
                     )}

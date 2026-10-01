@@ -2,52 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\HeroSettingRequest;
+use App\Models\HeroSetting;
+use App\Services\MediaStorage;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class HeroSettingController extends Controller
 {
-    public function edit()
+    public function __construct(private readonly MediaStorage $media) {}
+
+    public function edit(): Response
     {
-        $heroSetting = \App\Models\HeroSetting::first() ?? new \App\Models\HeroSetting();
-        return inertia('Admin/HeroSetting/Edit', [
-            'heroSetting' => $heroSetting
+        return Inertia::render('Admin/HeroSetting/Edit', [
+            'heroSetting' => HeroSetting::first() ?? new HeroSetting,
+            'availabilityStatuses' => config('portfolio.availability_statuses'),
         ]);
     }
 
-    public function update(Request $request)
+    public function update(HeroSettingRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'greeting' => 'required|string|max:255',
-            'full_name' => 'required|string|max:255',
-            'short_bio' => 'required|string',
-            'about_text' => 'nullable|string',
-            'availability_status' => 'required|in:Available,Busy,Not Looking',
-            'cta_text' => 'required|string|max:255',
-            'cta_link' => 'required|string|max:255',
-            'social_links' => 'nullable|array',
-            'profile_image' => 'nullable|image|max:2048',
-            'cv_file' => 'nullable|file|mimes:pdf|max:5120',
-        ]);
+        $heroSetting = HeroSetting::first() ?? new HeroSetting;
+        $directory = config('portfolio.directories.hero');
 
-        $heroSetting = \App\Models\HeroSetting::first() ?? new \App\Models\HeroSetting();
+        $data = $this->media->withUpload(
+            data: $request->validated(),
+            field: 'profile_image',
+            pathField: 'profile_image_path',
+            directory: $directory,
+            currentPath: $heroSetting->profile_image_path,
+        );
 
-        if ($request->hasFile('profile_image')) {
-            if ($heroSetting->profile_image_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($heroSetting->profile_image_path);
-            }
-            $validated['profile_image_path'] = $request->file('profile_image')->store('hero', 'public');
-        }
+        $data = $this->media->withUpload(
+            data: $data,
+            field: 'cv_file',
+            pathField: 'cv_file_path',
+            directory: $directory,
+            currentPath: $heroSetting->cv_file_path,
+        );
 
-        if ($request->hasFile('cv_file')) {
-            if ($heroSetting->cv_file_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($heroSetting->cv_file_path);
-            }
-            $validated['cv_file_path'] = $request->file('cv_file')->store('hero', 'public');
-        }
+        $heroSetting->fill($data)->save();
 
-        $heroSetting->fill($validated);
-        $heroSetting->save();
-
-        return redirect()->back()->with('success', 'Hero settings updated successfully.');
+        return back()->with('success', 'Hero settings updated successfully.');
     }
 }
