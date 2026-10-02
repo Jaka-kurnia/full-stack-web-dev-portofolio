@@ -58,6 +58,7 @@ export default function Index({ quotes }) {
             >
                 <Table>
                     <Table.Header>
+                        <Table.HeaderCell>No</Table.HeaderCell>
                         <Table.HeaderCell>Kutipan (Quote)</Table.HeaderCell>
                         <Table.HeaderCell>Status</Table.HeaderCell>
                         <Table.HeaderCell>Aksi</Table.HeaderCell>
@@ -65,6 +66,7 @@ export default function Index({ quotes }) {
                     <Table.Body>
                         {quotes.data.map((quote) => (
                             <Table.Row key={quote.id}>
+                                <Table.Cell className="font-bold text-gray-900">{quotes.data.indexOf(quote) + 1}</Table.Cell>
                                 <Table.Cell>
                                     <div className="text-sm text-gray-900 italic">"{quote.content}"</div>
                                 </Table.Cell>

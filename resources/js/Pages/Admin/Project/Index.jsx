@@ -26,6 +26,7 @@ export default function Index({ projects }) {
             >
                 <Table>
                     <Table.Header>
+                        <Table.HeaderCell>No</Table.HeaderCell>
                         <Table.HeaderCell>Project</Table.HeaderCell>
                         <Table.HeaderCell>Status</Table.HeaderCell>
                         <Table.HeaderCell>Featured</Table.HeaderCell>
@@ -35,6 +36,7 @@ export default function Index({ projects }) {
                     <Table.Body>
                         {projects.data.map((project) => (
                             <Table.Row key={project.id}>
+                                <Table.Cell className="font-bold text-gray-900">{projects.data.indexOf(project) + 1}</Table.Cell>
                                 <Table.Cell>
                                     <div className="flex items-center">
                                         <div className="flex-shrink-0 h-10 w-10">

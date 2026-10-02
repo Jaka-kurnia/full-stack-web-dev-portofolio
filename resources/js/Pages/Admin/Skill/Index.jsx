@@ -75,7 +75,8 @@ export default function Index({ skills, categories }) {
             >
                 <Table>
                     <Table.Header>
-                        <Table.HeaderCell>Ikon / Gambar</Table.HeaderCell>
+                      
+                        <Table.HeaderCell>No</Table.HeaderCell>
                         <Table.HeaderCell>Nama Skill</Table.HeaderCell>
                         <Table.HeaderCell>Kategori</Table.HeaderCell>
                         <Table.HeaderCell>Level Penguasaan</Table.HeaderCell>
@@ -85,15 +86,7 @@ export default function Index({ skills, categories }) {
                     <Table.Body>
                         {skills.data.map((skill) => (
                             <Table.Row key={skill.id}>
-                                <Table.Cell>
-                                    {skill.image_path ? (
-                                        <img src={`/storage/${skill.image_path}`} alt="Icon" className="w-10 h-10 object-contain rounded" />
-                                    ) : (
-                                        <div className="text-2xl text-gray-700">
-                                            <i className={skill.icon_identifier}></i>
-                                        </div>
-                                    )}
-                                </Table.Cell>
+                                <Table.Cell className="font-bold text-gray-900">{skills.data.indexOf(skill) + 1}</Table.Cell>
                                 <Table.Cell>
                                     <div className="font-bold text-gray-900">{skill.name}</div>
                                     {skill.icon_identifier && !skill.image_path && (

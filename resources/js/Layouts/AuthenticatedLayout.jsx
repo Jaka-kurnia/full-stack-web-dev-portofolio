@@ -1,22 +1,22 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import FlashToast from '@/Components/FlashToast';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import Dropdown from "@/Components/Dropdown";
+import FlashToast from "@/Components/FlashToast";
+import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
+import { Link, usePage } from "@inertiajs/react";
+import { useState } from "react";
 
 /**
  * Satu daftar menu untuk sidebar desktop maupun menu mobile,
  * sehingga penambahan menu admin cukup dilakukan di satu tempat.
  */
 const NAV_ITEMS = [
-    { routeName: 'dashboard', label: 'Dashboard' },
-    { routeName: 'admin.hero.edit', label: 'Pengaturan Profil' },
-    { routeName: 'admin.skills.index', label: 'Skill & Software' },
-    { routeName: 'admin.projects.index', label: 'Project', wildcard: true },
-    { routeName: 'admin.experiences.index', label: 'Latar Pendidikan' },
-    { routeName: 'admin.certifications.index', label: 'Sertifikasi' },
-    { routeName: 'admin.quotes.index', label: 'Quotes' },
+    { routeName: "dashboard", label: "Dashboard" },
+    { routeName: "admin.hero.edit", label: "Pengaturan Profil" },
+    { routeName: "admin.skills.index", label: "Skill & Software" },
+    { routeName: "admin.projects.index", label: "Project", wildcard: true },
+    { routeName: "admin.experiences.index", label: "Latar Pendidikan" },
+    { routeName: "admin.certifications.index", label: "Sertifikasi" },
+    { routeName: "admin.quotes.index", label: "Quotes" },
 ];
 
 const isCurrent = ({ routeName, wildcard }) =>
@@ -24,22 +24,31 @@ const isCurrent = ({ routeName, wildcard }) =>
 
 export default function AuthenticatedLayout({ title, header, children }) {
     const user = usePage().props.auth.user;
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] =
+        useState(false);
 
     const resolvedHeader =
         header ??
         (title ? (
-            <h2 className="font-semibold text-xl text-gray-800 leading-tight">{title}</h2>
+            <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                {title}
+            </h2>
         ) : null);
 
     return (
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex min-h-screen bg-gray-100 ">
             {/* Sidebar Desktop */}
-            <aside className="hidden md:flex flex-col w-64 bg-blue-800 shadow-xl">
+            <aside className="hidden md:flex flex-col w-64 bg-blue-800 shadow-xl h-screen sticky top-0">
                 <div className="flex items-center justify-center h-16 border-b border-blue-900 bg-blue-900/30">
                     <Link href="/" className="flex items-center gap-2">
-                        <ApplicationLogo className="block h-9 w-auto fill-current text-white" />
-                        <span className="font-bold text-lg text-white">Portfolio CMS</span>
+                        <img
+                            src="/public/img/logo.png"
+                            alt="Logo Dark"
+                            className="hidden h-10 w-auto dark:block"
+                        />
+                        <span className="font-bold text-lg text-white">
+                            Portfolio CMS
+                        </span>
                     </Link>
                 </div>
 
@@ -51,8 +60,8 @@ export default function AuthenticatedLayout({ title, header, children }) {
                                 href={route(item.routeName)}
                                 className={`flex items-center px-6 py-3 mt-1 text-sm font-medium transition-colors border-l-4 ${
                                     isCurrent(item)
-                                        ? 'bg-blue-900 border-yellow-400 text-yellow-400'
-                                        : 'border-transparent text-blue-200 hover:bg-blue-700 hover:text-white'
+                                        ? "bg-blue-900 border-yellow-400 text-yellow-400"
+                                        : "border-transparent text-blue-200 hover:bg-blue-700 hover:text-white"
                                 }`}
                             >
                                 {item.label}
@@ -69,12 +78,26 @@ export default function AuthenticatedLayout({ title, header, children }) {
                     {/* Mobile menu button & logo */}
                     <div className="flex items-center md:hidden">
                         <button
-                            onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
+                            onClick={() =>
+                                setShowingNavigationDropdown(
+                                    !showingNavigationDropdown,
+                                )
+                            }
                             className="p-2 text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                         >
                             <span className="sr-only">Open sidebar</span>
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <svg
+                                className="w-6 h-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
                             </svg>
                         </button>
                         <Link href="/" className="ml-4">
@@ -110,8 +133,14 @@ export default function AuthenticatedLayout({ title, header, children }) {
                             </Dropdown.Trigger>
 
                             <Dropdown.Content>
-                                <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                <Dropdown.Link href={route('logout')} method="post" as="button">
+                                <Dropdown.Link href={route("profile.edit")}>
+                                    Profile
+                                </Dropdown.Link>
+                                <Dropdown.Link
+                                    href={route("logout")}
+                                    method="post"
+                                    as="button"
+                                >
                                     Log Out
                                 </Dropdown.Link>
                             </Dropdown.Content>
@@ -135,12 +164,24 @@ export default function AuthenticatedLayout({ title, header, children }) {
                         </div>
                         <div className="pt-4 pb-1 border-t border-gray-200">
                             <div className="px-4">
-                                <div className="text-base font-medium text-gray-800">{user.name}</div>
-                                <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                                <div className="text-base font-medium text-gray-800">
+                                    {user.name}
+                                </div>
+                                <div className="text-sm font-medium text-gray-500">
+                                    {user.email}
+                                </div>
                             </div>
                             <div className="mt-3 space-y-1">
-                                <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                                <ResponsiveNavLink method="post" href={route('logout')} as="button">Log Out</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route("profile.edit")}>
+                                    Profile
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    method="post"
+                                    href={route("logout")}
+                                    as="button"
+                                >
+                                    Log Out
+                                </ResponsiveNavLink>
                             </div>
                         </div>
                     </div>
@@ -156,9 +197,7 @@ export default function AuthenticatedLayout({ title, header, children }) {
                             </div>
                         </header>
                     )}
-                    <main className="p-4 md:p-6 lg:p-8">
-                        {children}
-                    </main>
+                    <main className="p-4 md:p-6 lg:p-8">{children}</main>
                 </div>
             </div>
         </div>
