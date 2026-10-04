@@ -50,12 +50,37 @@ export default function Welcome({ auth, canLogin, hero, skills, projects, experi
         <div className={isDarkMode ? 'dark' : ''}>
             <div className="min-h-screen bg-gray-50 dark:bg-[#0B0F19] text-gray-900 dark:text-white font-sans selection:bg-indigo-500 selection:text-white overflow-x-hidden transition-colors duration-300">
             <Head>
-                <title>{`${hero?.full_name || 'Jaka Kurnia'} - Jasa Pembuatan & Pengembangan Web`}</title>
-                <meta name="description" content="Jaka Kurnia adalah Full-Stack Web Developer profesional. Menyediakan jasa pembuatan, pengembangan, dan optimasi website atau aplikasi web (Web Development) berkualitas." />
-                <meta name="keywords" content="Jaka Kurnia, Jasa Pembuatan Web, Pengembangan Web, Jasa Bikin Website, Full-Stack Web Developer, Web Developer Indonesia, Programmer" />
-                <meta property="og:title" content="Jaka Kurnia - Jasa Pembuatan & Pengembangan Web" />
-                <meta property="og:description" content="Full-Stack Web Developer profesional yang menyediakan jasa pembuatan dan pengembangan aplikasi berbasis web." />
+                <title>{`${hero?.full_name || 'Jaka Kurnia'} - Jasa Pembuatan Website & Konsultan IT`}</title>
+                <meta name="description" content="Layanan jasa pembuatan website profesional, cepat, dan responsif. Jaka Kurnia adalah Web Developer & Konsultan IT yang siap membangun aplikasi web custom untuk bisnis Anda." />
+                <meta name="keywords" content="jasa pembuatan website, jasa buat web, bikin website murah, web developer indonesia, konsultan IT, jasa bikin website, programmer freelance, full stack developer, pembuatan aplikasi web, Jaka Kurnia" />
+                <meta name="author" content="Jaka Kurnia" />
+                <meta name="robots" content="index, follow" />
+                
+                {/* Open Graph / Social Media */}
                 <meta property="og:type" content="website" />
+                <meta property="og:title" content={`${hero?.full_name || 'Jaka Kurnia'} - Jasa Pembuatan Website Profesional`} />
+                <meta property="og:description" content="Butuh website profesional? Jaka Kurnia menyediakan jasa pembuatan website dan aplikasi web custom terpercaya untuk meningkatkan bisnis Anda." />
+                
+                {/* Twitter */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={`${hero?.full_name || 'Jaka Kurnia'} - Jasa Pembuatan Website`} />
+                <meta name="twitter:description" content="Layanan web developer profesional dan konsultan IT. Hubungi sekarang untuk pembuatan website bisnis Anda." />
+
+                {/* Schema.org Structured Data */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "ProfessionalService",
+                        "name": hero?.full_name || "Jaka Kurnia",
+                        "description": "Layanan Jasa Pembuatan Website dan Web Developer Profesional.",
+                        "image": "/img/logo.png",
+                        "priceRange": "$$",
+                        "address": {
+                            "@type": "PostalAddress",
+                            "addressCountry": "ID"
+                        }
+                    })}
+                </script>
                 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
             </Head>
 

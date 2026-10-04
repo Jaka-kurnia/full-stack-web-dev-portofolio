@@ -11,19 +11,22 @@ export default function AboutSection({ hero, programmingSkills, softwareSkills, 
     return (
         <section id="about" className="flex flex-col lg:flex-row gap-12 lg:gap-20 mb-32 pt-10 scroll-mt-28">
             {/* Left: Photo Card */}
-            <div className="lg:w-1/3" data-aos="fade-up" data-aos-delay="100">
-                <div className="bg-white dark:bg-[#131726] border border-gray-200 dark:border-gray-800/60 rounded-[2rem] p-4 h-full flex flex-col justify-end min-h-[450px] relative overflow-hidden group shadow-2xl">
+            <aside className="lg:w-1/3" data-aos="fade-up" data-aos-delay="100">
+                <figure className="bg-white dark:bg-[#131726] border border-gray-200 dark:border-gray-800/60 rounded-[2rem] p-4 h-full flex flex-col justify-end min-h-[450px] relative overflow-hidden group shadow-2xl">
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-[#0B0F19] via-transparent to-transparent opacity-60 z-10 pointer-events-none"></div>
                     {hero?.profile_image_path ? (
-                        <img src={`/storage/${hero.profile_image_path}`} alt={hero.full_name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        <>
+                            <img src={`/storage/${hero.profile_image_path}`} alt={hero.full_name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <figcaption className="sr-only">Foto Profil Tentang Saya</figcaption>
+                        </>
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-gray-600 bg-gray-900">Foto Profil</div>
                     )}
-                </div>
-            </div>
+                </figure>
+            </aside>
 
             {/* Right: Content */}
-            <div className="lg:w-2/3 flex flex-col justify-center" data-aos="fade-left" data-aos-delay="200">
+            <article className="lg:w-2/3 flex flex-col justify-center" data-aos="fade-left" data-aos-delay="200">
                 <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
                     Tentang Saya
                 </h2>
@@ -32,7 +35,7 @@ export default function AboutSection({ hero, programmingSkills, softwareSkills, 
                 </p>
 
                 {/* Tabs Navigation */}
-                <div className="flex gap-6 border-b border-gray-300 dark:border-gray-800/80 mb-8 overflow-x-auto pb-1 tabs-scroll">
+                <nav aria-label="About Sections" className="flex gap-6 border-b border-gray-300 dark:border-gray-800/80 mb-8 overflow-x-auto pb-1 tabs-scroll">
                     {TABS.map(tab => (
                         <button
                             key={tab}
@@ -45,7 +48,7 @@ export default function AboutSection({ hero, programmingSkills, softwareSkills, 
                             )}
                         </button>
                     ))}
-                </div>
+                </nav>
 
                 {/* Dynamic Tab Content (with slide animation) */}
                 <div className="min-h-[280px] overflow-hidden relative">
@@ -83,10 +86,9 @@ export default function AboutSection({ hero, programmingSkills, softwareSkills, 
 
                 </div>
 
-                {/* Quotes Section (Always Visible) */}
                 <QuotesCarousel quotes={quotes} />
 
-            </div>
+            </article>
         </section>
     );
 }

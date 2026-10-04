@@ -19,14 +19,14 @@ export default function ProjectsSection({ projects, onSelect }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {projects && projects.length > 0 ? (
                     projects.map((project, index) => (
-                        <div
+                        <article
                             key={project.id}
                             data-aos="fade-up"
                             data-aos-delay={index * 100}
                             onClick={() => onSelect(project)}
                             className="bg-white dark:bg-[#131726] border border-gray-200 dark:border-gray-800 rounded-[1.5rem] overflow-hidden cursor-pointer group hover:border-indigo-500/40 hover:shadow-[0_0_30px_rgba(79,70,229,0.1)] transition-all duration-300 flex flex-col h-full"
                         >
-                            <div className="h-60 overflow-hidden bg-gray-100 dark:bg-gray-900 relative">
+                            <figure className="h-60 overflow-hidden bg-gray-100 dark:bg-gray-900 relative">
                                 {project.thumbnail_path ? (
                                     <img
                                         src={`/storage/${project.thumbnail_path}`}
@@ -38,7 +38,7 @@ export default function ProjectsSection({ projects, onSelect }) {
                                         No Thumbnail
                                     </div>
                                 )}
-                            </div>
+                            </figure>
                             <div className="p-8 flex flex-col flex-grow">
                                 <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white group-hover:text-[#2563EB] transition-colors">
                                     {project.title}
@@ -59,7 +59,7 @@ export default function ProjectsSection({ projects, onSelect }) {
                                         ))}
                                 </div>
                             </div>
-                        </div>
+                        </article>
                     ))
                 ) : (
                     <div className="col-span-3 text-center py-24 text-gray-500 border border-dashed border-gray-300 dark:border-gray-800 rounded-[2rem]">
