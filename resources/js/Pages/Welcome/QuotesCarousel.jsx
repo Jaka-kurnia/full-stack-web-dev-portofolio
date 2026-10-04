@@ -30,9 +30,10 @@ export default function QuotesCarousel({ quotes }) {
                         </div>
                         <div className="flex justify-center gap-2 mt-6">
                             {quotes.map((q, idx) => (
-                                <span key={q.id} onClick={() => setCurrentQuoteIndex(idx)} className={`w-2 h-2 rounded-full cursor-pointer transition-all ${idx === currentQuoteIndex ? 'bg-indigo-500 shadow-[0_0_5px_rgba(79,70,229,0.8)] scale-125' : 'bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-500'}`}></span>
+                                <span key={q.id} onClick={() => setCurrentQuoteIndex(idx)} className={`w-2 h-2 rounded-full cursor-pointer transition-all ${idx === currentQuoteIndex ? 'hover:scale-105 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#1D4ED8] text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] dark:from-[#3B82F6] dark:to-[#38BDF8] dark:hover:from-[#60A5FA] dark:hover:to-[#60A5FA] dark:text-white dark:shadow-[0_4px_14px_rgba(56,189,248,0.25)] scale-125' : 'bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-500'}`}></span>
                             ))}
                         </div>
+
                     </div>
                     <button
                         onClick={() => setCurrentQuoteIndex((prev) => (prev === quotes.length - 1 ? 0 : prev + 1))}

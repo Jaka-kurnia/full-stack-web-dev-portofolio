@@ -2,7 +2,7 @@ import SectionHeading from './SectionHeading';
 
 export default function CertificationsSection({ certifications, onSelect }) {
     return (
-        <section id="certifications" className="pt-24" data-aos="fade-up" data-aos-delay="300">
+        <section id="certifications" className="pt-24 scroll-mt-28" data-aos="fade-up" data-aos-delay="300">
             <SectionHeading eyebrow="SERTIFIKASI & PENGHARGAAN" headingClassName="mb-10">
                 My <span className="text-indigo-500">Certifications.</span>
             </SectionHeading>

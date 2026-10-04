@@ -50,7 +50,12 @@ export default function Welcome({ auth, canLogin, hero, skills, projects, experi
         <div className={isDarkMode ? 'dark' : ''}>
             <div className="min-h-screen bg-gray-50 dark:bg-[#0B0F19] text-gray-900 dark:text-white font-sans selection:bg-indigo-500 selection:text-white overflow-x-hidden transition-colors duration-300">
             <Head>
-                <title>{hero?.full_name || 'Portfolio'}</title>
+                <title>{`${hero?.full_name || 'Jaka Kurnia'} - Jasa Pembuatan & Pengembangan Web`}</title>
+                <meta name="description" content="Jaka Kurnia adalah Full-Stack Web Developer profesional. Menyediakan jasa pembuatan, pengembangan, dan optimasi website atau aplikasi web (Web Development) berkualitas." />
+                <meta name="keywords" content="Jaka Kurnia, Jasa Pembuatan Web, Pengembangan Web, Jasa Bikin Website, Full-Stack Web Developer, Web Developer Indonesia, Programmer" />
+                <meta property="og:title" content="Jaka Kurnia - Jasa Pembuatan & Pengembangan Web" />
+                <meta property="og:description" content="Full-Stack Web Developer profesional yang menyediakan jasa pembuatan dan pengembangan aplikasi berbasis web." />
+                <meta property="og:type" content="website" />
                 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
             </Head>
 

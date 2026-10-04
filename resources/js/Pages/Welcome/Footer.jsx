@@ -2,7 +2,7 @@ export default function Footer({ hero }) {
     return (
         <footer
             id="contact"
-            className="text-center py-10 mt-12 border-t border-gray-200 dark:border-gray-800/80 bg-white dark:bg-[#080B14]"
+            className="text-center py-10 mt-12 border-t border-gray-200 dark:border-gray-800/80 bg-white dark:bg-[#080B14] scroll-mt-28"
             data-aos="fade-up"
         >
             <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">

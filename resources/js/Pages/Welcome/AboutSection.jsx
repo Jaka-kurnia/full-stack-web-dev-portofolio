@@ -9,7 +9,7 @@ export default function AboutSection({ hero, programmingSkills, softwareSkills, 
     const [activeTab, setActiveTab] = useState(TABS[0]);
 
     return (
-        <section id="about" className="flex flex-col lg:flex-row gap-12 lg:gap-20 mb-32 pt-10">
+        <section id="about" className="flex flex-col lg:flex-row gap-12 lg:gap-20 mb-32 pt-10 scroll-mt-28">
             {/* Left: Photo Card */}
             <div className="lg:w-1/3" data-aos="fade-up" data-aos-delay="100">
                 <div className="bg-white dark:bg-[#131726] border border-gray-200 dark:border-gray-800/60 rounded-[2rem] p-4 h-full flex flex-col justify-end min-h-[450px] relative overflow-hidden group shadow-2xl">
@@ -24,7 +24,7 @@ export default function AboutSection({ hero, programmingSkills, softwareSkills, 
 
             {/* Right: Content */}
             <div className="lg:w-2/3 flex flex-col justify-center" data-aos="fade-left" data-aos-delay="200">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-indigo-500 tracking-tight">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
                     Tentang Saya
                 </h2>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg mb-10 text-justify">
@@ -41,7 +41,7 @@ export default function AboutSection({ hero, programmingSkills, softwareSkills, 
                         >
                             {tab}
                             {activeTab === tab && (
-                                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 rounded-t-full shadow-[0_0_8px_rgba(79,70,229,0.8)]"></div>
+                                <div className="absolute bottom-0 left-0 w-full h-0.5 hover:scale-105 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#1D4ED8] text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] dark:from-[#3B82F6] dark:to-[#38BDF8] dark:hover:from-[#60A5FA] dark:hover:to-[#60A5FA] dark:text-white dark:shadow-[0_4px_14px_rgba(56,189,248,0.25)]"></div>
                             )}
                         </button>
                     ))}
