@@ -70,15 +70,32 @@ export default function Welcome({ auth, canLogin, hero, skills, projects, experi
                 <script type="application/ld+json">
                     {JSON.stringify({
                         "@context": "https://schema.org",
-                        "@type": "ProfessionalService",
-                        "name": hero?.full_name || "Jaka Kurnia",
-                        "description": "Layanan Jasa Pembuatan Website dan Web Developer Profesional.",
-                        "image": "/img/logo.png",
-                        "priceRange": "$$",
-                        "address": {
-                            "@type": "PostalAddress",
-                            "addressCountry": "ID"
-                        }
+                        "@graph": [
+                            {
+                                "@type": "ProfessionalService",
+                                "name": `Jasa Pembuatan Website - ${hero?.full_name || 'Jaka Kurnia'}`,
+                                "description": "Layanan Jasa Pembuatan Website dan Web Developer Profesional.",
+                                "image": "/img/logo.png",
+                                "priceRange": "$$",
+                                "address": {
+                                    "@type": "PostalAddress",
+                                    "addressCountry": "ID"
+                                }
+                            },
+                            {
+                                "@type": "Person",
+                                "name": hero?.full_name || "Jaka Kurnia",
+                                "jobTitle": "Full-Stack Web Developer & Konsultan IT",
+                                "url": "https://github.com/Jaka-kurnia",
+                                "image": "/img/logo.png",
+                                "sameAs": [
+                                    hero?.social_links?.linkedin || "https://www.linkedin.com/in/jaka-kurnia",
+                                    "https://github.com/Jaka-kurnia",
+                                    "https://www.instagram.com/im.jakaa/",
+                                    "https://www.tiktok.com/@kurniaa.jsx"
+                                ]
+                            }
+                        ]
                     })}
                 </script>
                 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
